@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 
-const chance_table = {
-    '🍒':1,
-    '🍋':2 ,
-    '🍊':3 ,
-    '🍉':4,
-    '🍇':5,
-    '7️⃣':7,
+const chance_table_1:ChanceTable = {
+  '🍒': { multiplier: 1, chance: .30 },
+  '🍋': { multiplier: 2, chance: .25 },
+  '🍊': { multiplier: 3, chance: .20 },
+  '🍉': { multiplier: 4, chance: .12 },
+  '🍇': { multiplier: 5, chance: .08 },
+  '7️⃣': { multiplier: 7, chance: .05 },
+  '🤑': { multiplier: 100, chance: .02 }
+};
+
+// Define the structure for each symbol's data
+interface SymbolData {
+  multiplier: number;
+  chance: number;
 }
 
+// Define the overall chance table structure
+interface ChanceTable {
+  [symbol: string]: SymbolData;
+}
 
 // Define slot symbols for the slot machine
-const symbols = ['🍒', '🍋', '🍊', '🍉', '🍇', '7️⃣'];
+const symbols = ['🍒', '🍋', '🍊', '🍉', '🍇', '7️⃣','🤑'];
 
 const SlotMachine: React.FC = ({balance, setBalance}: {balance:number, setBalance:any}) => {
   // Slot state: each reel will have a symbol
@@ -20,6 +31,28 @@ const SlotMachine: React.FC = ({balance, setBalance}: {balance:number, setBalanc
   const [spinCount, setSpinCount] = useState<number>(0);
   const [message, setMessage] = useState<string>('');
 const [bet, setBet] = useState(1)
+
+    function getRandomSymbol(chance_table:ChanceTable) {
+  // Convert the table to an array of entries
+  const entries = Object.entries(chance_table);
+
+  // Calculate the total weight
+  const totalChance = entries.reduce((sum, [_, data]) => sum + data.chance, 0);
+
+  // Get a random number in the range [0, totalChance)
+  const rand = Math.random() * totalChance;
+
+  // Iterate to find where the random value falls
+  let cumulative = 0;
+  for (const [symbol, data] of entries) {
+    cumulative += data.chance;
+    if (rand < cumulative) {
+      return symbol;
+    }
+  }
+
+}
+
 
   // Function to start the spin
   const spinReels = () => {
@@ -31,9 +64,9 @@ const [bet, setBet] = useState(1)
     // Simulate spinning by setting new random symbols after a short delay
     setTimeout(() => {
       const newReels = [
-        symbols[Math.floor(Math.random() * symbols.length)],
-        symbols[Math.floor(Math.random() * symbols.length)],
-        symbols[Math.floor(Math.random() * symbols.length)],
+        getRandomSymbol(chance_table_1),
+        getRandomSymbol(chance_table_1),
+        getRandomSymbol(chance_table_1)
       ];
       setReels(newReels);
       checkForWin(newReels);
@@ -44,7 +77,6 @@ const [bet, setBet] = useState(1)
   // Check if all reels show the same symbol (win condition)
   const checkForWin = (newReels: string[]) => {
     if (newReels.every(symbol => symbol === newReels[0])) {
-      setMessage('Congratulations! You win!');
       handleWin();
       setSpinCount(0)
     }
@@ -59,7 +91,9 @@ const [bet, setBet] = useState(1)
   }
 
   const handleWin = () => {
-    const win = spinCount + 500 * bet
+    const icon = reels[0]
+    const win = (chance_table_1[icon].multiplier * bet) + bet
+    setMessage("Congratulations! You win $" + win + "!");
     setBalance(balance + win)
   }
 

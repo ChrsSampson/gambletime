@@ -9,8 +9,9 @@ export default function BalanceBar({balance, setPage}: {balance:any, setPage:any
             <div className="flex justify-evenly gap-2">
                 { balance > 0 &&
                     <>
-                    <button className={''} onClick={() => setPage('blackjack')}>BlackJack</button>
-                    <button onClick={() => setPage('slot')}>Slots</button>
+                        <button className={''} onClick={() => setPage('blackjack')}>BlackJack</button>
+                        <button onClick={() => setPage('slot')}>Slots</button>
+                        <button onClick={() => setPage('crash')}>Stonks</button>
                     </>
                 }
             </div>

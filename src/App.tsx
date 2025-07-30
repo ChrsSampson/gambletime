@@ -4,12 +4,18 @@ import BalanceBar from './components/BalanceBar'
 import BlackjackGame from './components/BlackJackGame'
 import useLocalStorage from './hooks/useLocalStorage'
 import SlotMachine from './components/SlotMachine'
+import Crash from './components/crash'
 import Bank from './components/Bank'
 
 function App() {
   const [page, setPage] = useState('blackjack')
   const [balance, setBalance] = useLocalStorage('balance', 1000)
   const [inbank, setInBank] = useState(false)
+
+  const updateBalance = (v: any) => {
+    const n = Number(v)
+    setBalance(n)
+  }
 
   const gameOver = () => {
       return(
@@ -38,13 +44,15 @@ function App() {
 
     switch(page) {
       case "bank":
-        return <Bank balance={balance} setBalance={setBalance} />
+        return <Bank balance={balance} setBalance={updateBalance} />
       case "slot":
-        return <SlotMachine balance={balance} setBalance={setBalance} />
+        return <SlotMachine balance={balance} setBalance={updateBalance} />
       case "blackjack":
-           return <BlackjackGame balance={balance} setBalance={setBalance} />
+           return <BlackjackGame balance={balance} setBalance={updateBalance} />
       case 'gameover':
         return gameOver()
+      case "crash":
+        return <Crash balance={balance} setBalance={updateBalance} />
     }
 
     

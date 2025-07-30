@@ -1,4 +1,7 @@
+import useLocalStorage from "../hooks/useLocalStorage"
+
 export default function Bank ({balance, setBalance}: {balance:number, setBalance: any}) {
+    const [money, setMoney] = useLocalStorage('bankAccount', 2373.45)
 
     function applyBalance(v:any) {
         setBalance(balance + v)
@@ -12,6 +15,10 @@ export default function Bank ({balance, setBalance}: {balance:number, setBalance
             <div className="border p-2 my-2 rounded">
                 <h2>You</h2>
                 <h3>Credit Score: 750</h3>
+            </div>
+            <div className="border p-2 my-2 rounded">
+                <h2>Accounts</h2>
+                <h4>Account ending in ***223: {money}</h4>
             </div>
             <div className="grid grid-cols-2 gap-2">
                 <div onClick={() => applyBalance(1000)} className="border rounded p-2 hover:bg-blue-500">
