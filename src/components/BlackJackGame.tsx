@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { createDeck, calculateScore } from '../utils/deck';
-import type { Card } from '../utils/deck';
+import React, { useState, useEffect } from "react";
+import { createDeck, calculateScore } from "../utils/deck";
+import type { Card } from "../utils/deck";
 
-const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) => {
+const BlackjackGame = ({
+  balance,
+  setBalance,
+}: {
+  balance: number;
+  setBalance: any;
+}) => {
   const [deck, setDeck] = useState<Card[]>([]);
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [isGameOver, setIsGameOver] = useState(true);
-  const [message, setMessage] = useState('');  // Starting balance
-  const [bet, setBet] = useState(0);  // Current bet
+  const [message, setMessage] = useState(""); // Starting balance
+  const [bet, setBet] = useState(0); // Current bet
 
   useEffect(() => {
     startGame();
@@ -27,7 +33,7 @@ const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) 
     setPlayerHand(player);
     setDealerHand(dealer);
     setIsGameOver(false);
-    setMessage('');
+    setMessage("");
   };
 
   const hit = () => {
@@ -39,8 +45,9 @@ const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) 
 
     if (calculateScore(newHand) > 21) {
       setIsGameOver(true);
-      setMessage('Bust! You lose.');
-      setBalance(prev => prev - bet);  // Deduct bet if player loses
+      setMessage("Bust! You lose.");
+      const l = Number(balance) - Number(bet);
+      setBalance(l); // Deduct bet if player loses
     }
   };
 
@@ -56,15 +63,17 @@ const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) 
     const playerScore = calculateScore(playerHand);
     const dealerScore = calculateScore(newDealerHand);
 
-    let result = '';
+    let result = "";
     if (dealerScore > 21 || playerScore > dealerScore) {
-      result = 'You win!';
-      setBalance(prev => prev + bet);  // Add bet if player wins
+      result = "You win!";
+      const l = Number(balance) + Number(bet);
+      setBalance(l); // Add bet if player wins
     } else if (dealerScore === playerScore) {
-      result = 'Push.';
+      result = "Push.";
     } else {
-      result = 'You lose.';
-      setBalance(prev => prev - bet);  // Deduct bet if player loses
+      result = "You lose.";
+      const l = Number(balance) - Number(bet);
+      setBalance(l); // Deduct bet if player loses
     }
 
     setDealerHand(newDealerHand);
@@ -82,19 +91,21 @@ const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) 
   const renderHand = (hand: Card[], hideFirst: boolean = false) => {
     return (
       <div>
-      <div className="flex gap-2">
-        {hand.map((card, index) => (
-          <div
-            key={index}
-            className="h-16 w-12 border text-black border-black rounded bg-white text-center text-xl flex flex-row items-center justify-center shadow"
-          >
-            {hideFirst && index === 0 && !isGameOver ? '🂠' : `${card.rank}${card.suit}`}
-          </div>
-        ))}
-      </div>
-      { hideFirst &&
-        <p>Score: {isGameOver ? calculateScore(dealerHand) : "~"}</p>
-      }
+        <div className="flex gap-2">
+          {hand.map((card, index) => (
+            <div
+              key={index}
+              className="h-16 w-12 border text-black border-black rounded bg-white text-center text-xl flex flex-row items-center justify-center shadow"
+            >
+              {hideFirst && index === 0 && !isGameOver
+                ? "🂠"
+                : `${card.rank}${card.suit}`}
+            </div>
+          ))}
+        </div>
+        {hideFirst && (
+          <p>Score: {isGameOver ? calculateScore(dealerHand) : "~"}</p>
+        )}
       </div>
     );
   };
@@ -133,17 +144,27 @@ const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) 
 
       {!isGameOver ? (
         <div className="space-x-4 mt-4 flex flex-row gap-3">
-
-          <button onClick={hit} disabled={isGameOver} className="px-4 py-2 bg-blue-500 text-white rounded">
+          <button
+            onClick={hit}
+            disabled={isGameOver}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
             Hit
           </button>
-          <button onClick={stand} disabled={isGameOver} className="px-4 py-2 bg-green-500 text-white rounded">
+          <button
+            onClick={stand}
+            disabled={isGameOver}
+            className="px-4 py-2 bg-green-500 text-white rounded"
+          >
             Stand
           </button>
         </div>
       ) : (
         <div className="mt-4 space-y-2">
-          <button onClick={startGame} className="px-4 py-2 bg-gray-700 text-white rounded">
+          <button
+            onClick={startGame}
+            className="px-4 py-2 bg-gray-700 text-white rounded"
+          >
             Play
           </button>
         </div>

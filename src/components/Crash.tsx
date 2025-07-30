@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState, useRef } from "react";
 
 const getRandomCrashPoint = () => {
@@ -8,17 +6,25 @@ const getRandomCrashPoint = () => {
   return Math.max(0.01, -1 / Math.log(r));
 };
 
-const Crash: React.FC = ({balance, setBalance}: {balance:number, setBalance:any}) => {
+const Crash: React.FC = ({
+  balance,
+  setBalance,
+}: {
+  balance: number;
+  setBalance: any;
+}) => {
   const [multiplier, setMultiplier] = useState(0.0);
-  const [gameState, setGameState] = useState<"waiting" | "running" | "crashed">("waiting");
+  const [gameState, setGameState] = useState<"waiting" | "running" | "crashed">(
+    "waiting"
+  );
   const [crashPoint, setCrashPoint] = useState(0);
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [cashOut, setCashOut] = useState<number | null>(null);
   const multiplierRef = useRef(0.0);
-  const [bet, setBet] = useState('')
-  const [winAmount, setWinAmount] = useState(0)
+  const [bet, setBet] = useState("");
+  const [winAmount, setWinAmount] = useState(0);
 
-const animationRef = useRef<number | null>(null);
+  const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const lastValueRef = useRef<number>(0.0);
 
@@ -34,7 +40,6 @@ const animationRef = useRef<number | null>(null);
     animationRef.current = requestAnimationFrame(updateMultiplier);
   };
 
-    
   const updateMultiplier = (timestamp: number) => {
     if (!startTimeRef.current) startTimeRef.current = timestamp;
     const elapsed = (timestamp - startTimeRef.current) / 1000; // in seconds
@@ -46,8 +51,8 @@ const animationRef = useRef<number | null>(null);
       setMultiplier(crashPoint);
       setGameState("crashed");
       cancelAnimationFrame(animationRef.current!);
-    //   player lose
-        setBalance(Number(balance -= bet))
+      //   player lose
+      setBalance(Number((balance -= bet)));
       return;
     }
 
@@ -61,50 +66,77 @@ const animationRef = useRef<number | null>(null);
       setCashOut(lastValueRef.current);
       setGameState("crashed");
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-        // payout
-        const win = (bet * multiplier).toFixed(2)
-        setWinAmount(win)
-        const r = Number(balance) + winAmount
-        setBalance(r)
+      // payout
+      const win = calculateWin();
+      const r = Number(balance) + Number(win);
+      setWinAmount(win);
+      setBalance(r);
     }
   };
+
+  function calculateWin() {
+    const m = Number(multiplier);
+    const b = Number(bet);
+
+    const w = m * b;
+
+    return w.toFixed(2);
+  }
 
   return (
     <div className="min-w-1/2 flex flex-col items-center justify-center p-4 rounded border text-white">
       <div className="text-center space-y-6">
         <div>
-        <h1 className="text-4xl font-bold">🚀 Stonks 💎</h1>
-        <h4 className="italic">They only go up..until they don't</h4>
+          <h1 className="text-4xl font-bold">🚀 Stonks 💎</h1>
+          <h4 className="italic">They only go up..until they don't</h4>
         </div>
-        <div className={`text-5xl font-mono ${gameState === "crashed" ? "text-red-500" : "text-green-400"}`}>
+        <div
+          className={`text-5xl font-mono ${
+            gameState === "crashed" ? "text-red-500" : "text-green-400"
+          }`}
+        >
           {multiplier.toFixed(2)}x
         </div>
         {gameState === "waiting" && (
-          <button onClick={startGame} className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded">
+          <button
+            onClick={startGame}
+            className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded"
+          >
             Start
           </button>
         )}
         {gameState === "running" && (
-          <button onClick={handleCashOut} className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 rounded">
+          <button
+            onClick={handleCashOut}
+            className="px-6 py-2 bg-yellow-500 hover:bg-yellow-600 rounded"
+          >
             Cash Out
           </button>
         )}
         {gameState === "crashed" && (
           <div className="space-y-4">
             <div className="text-xl">
-              {cashOut ? `✅ Cashed out at ${cashOut.toFixed(2)}x for $${winAmount}!` : `💥 Crashed at ${multiplier.toFixed(2)}x`}
+              {cashOut
+                ? `✅ Cashed out at ${cashOut.toFixed(2)}x for $${winAmount}!`
+                : `💥 Crashed at ${multiplier.toFixed(2)}x`}
             </div>
-            <button onClick={startGame} className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded">
+            <button
+              onClick={startGame}
+              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded"
+            >
               Play Again
             </button>
           </div>
         )}
-        
       </div>
-      <input value={bet} onChange={(e) => setBet(e.target.value)} className="border p-1 rounded" placeholder="Bet" />
+      <input
+        value={bet}
+        onChange={(e) => setBet(e.target.value)}
+        className="border p-1 rounded"
+        placeholder="Bet"
+      />
     </div>
-    
   );
 };
 
-export default Crash
+export default Crash;
