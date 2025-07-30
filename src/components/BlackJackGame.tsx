@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { createDeck, calculateScore } from '../utils/deck';
 import type { Card } from '../utils/deck';
 
-const BlackjackGame: React.FC = () => {
+const BlackjackGame = ({balance, setBalance}: {balance:number, setBalance:any}) => {
   const [deck, setDeck] = useState<Card[]>([]);
   const [playerHand, setPlayerHand] = useState<Card[]>([]);
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [message, setMessage] = useState('');
-  const [balance, setBalance] = useState(1000);  // Starting balance
+  const [isGameOver, setIsGameOver] = useState(true);
+  const [message, setMessage] = useState('');  // Starting balance
   const [bet, setBet] = useState(0);  // Current bet
 
   useEffect(() => {
@@ -82,64 +81,70 @@ const BlackjackGame: React.FC = () => {
 
   const renderHand = (hand: Card[], hideFirst: boolean = false) => {
     return (
+      <div>
       <div className="flex gap-2">
         {hand.map((card, index) => (
           <div
             key={index}
-            className="h-16 border border-black rounded bg-white text-center text-xl flex flex-row items-center justify-center shadow"
+            className="h-16 w-12 border text-black border-black rounded bg-white text-center text-xl flex flex-row items-center justify-center shadow"
           >
             {hideFirst && index === 0 && !isGameOver ? '🂠' : `${card.rank}${card.suit}`}
           </div>
         ))}
       </div>
+      { hideFirst &&
+        <p>Score: {isGameOver ? calculateScore(dealerHand) : "~"}</p>
+      }
+      </div>
     );
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto text-center space-y-6">
-      <h1 className="text-3xl font-bold">Blackjack</h1>
+    <div className="p-8 max-w-md mx-auto text-center space-y-6 flex flex-col gap-5">
+      <div className="border rounded p-4">
+        <h1 className="text-3xl font-bold">Blackjack</h1>
+        <h5 className="font-sm italic">Dealer Stands on 17</h5>
+      </div>
 
-      <div>
+      <h4 className="text-xl font-bold">{message}</h4>
+
+      <div className="border-1 p-4 rounded-md">
         <h2 className="text-xl font-semibold">Dealer's Hand</h2>
         {renderHand(dealerHand, true)}
       </div>
 
-      <div>
+      <div className="border-1 rounded p-4">
         <h2 className="text-xl font-semibold">Your Hand</h2>
         {renderHand(playerHand)}
         <p>Score: {calculateScore(playerHand)}</p>
       </div>
 
-      <div className="mt-6">
-        <h2 className="text-xl font-semibold">Balance: ${balance}</h2>
+      <div className="mt-2">
         <h2 className="text-xl font-semibold">Bet: </h2>
         <input
           type="number"
           value={bet}
           onChange={handleBetChange}
-          className="px-3 py-2 border rounded"
-          min="1"
+          className="px-3 py-2 border rounded disabled:border-gray-500 disabled:text-gray-500"
           max={balance}
+          disabled={!isGameOver}
         />
       </div>
 
       {!isGameOver ? (
-        <div className="space-x-4 mt-4">
-          <button onClick={startGame} className="px-4 py-2 bg-blue-500 text-white rounded">
-            Start Game
-          </button>
-          <button onClick={hit} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <div className="space-x-4 mt-4 flex flex-row gap-3">
+
+          <button onClick={hit} disabled={isGameOver} className="px-4 py-2 bg-blue-500 text-white rounded">
             Hit
           </button>
-          <button onClick={stand} className="px-4 py-2 bg-green-500 text-white rounded">
+          <button onClick={stand} disabled={isGameOver} className="px-4 py-2 bg-green-500 text-white rounded">
             Stand
           </button>
         </div>
       ) : (
         <div className="mt-4 space-y-2">
-          <p className="text-xl font-bold">{message}</p>
           <button onClick={startGame} className="px-4 py-2 bg-gray-700 text-white rounded">
-            Play Again
+            Play
           </button>
         </div>
       )}
