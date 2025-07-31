@@ -64,11 +64,17 @@ const BlackjackGame = ({
     const dealerScore = calculateScore(newDealerHand);
 
     let result = "";
-    if (dealerScore > 21 || playerScore > dealerScore) {
+    if (playerScore == 21) {
+      result = "BlackJack!"
+      const r = Number(bet) * (3/2)
+      setBalance(Number(balance) + Number(r))
+    }
+    else if (dealerScore > 21 || playerScore > dealerScore) {
       result = "You win!";
       const l = Number(balance) + Number(bet);
       setBalance(l); // Add bet if player wins
-    } else if (dealerScore === playerScore) {
+    }
+    else if (dealerScore === playerScore) {
       result = "Push.";
     } else {
       result = "You lose.";
@@ -111,13 +117,15 @@ const BlackjackGame = ({
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto text-center space-y-6 flex flex-col gap-5">
+    <div className="p-8 max-w-md mx-auto text-center flex flex-col gap-5">
       <div className="border rounded p-4">
         <h1 className="text-3xl font-bold">Blackjack</h1>
         <h5 className="font-sm italic">Dealer Stands on 17</h5>
+        <h5 className="font-sm italic">Blackjack pays out 3/2</h5>
       </div>
-
-      <h4 className="text-xl font-bold">{message}</h4>
+      <div >
+        <h4 className="text-xl font-bold min-h-[1.5em]">{message}</h4>
+      </div>
 
       <div className="border-1 p-4 rounded-md">
         <h2 className="text-xl font-semibold">Dealer's Hand</h2>
