@@ -15,6 +15,7 @@ export default function BalanceBar({
             </button>
             <button onClick={() => setPage("slot")}>Slots</button>
             <button onClick={() => setPage("crash")}>Stonks</button>
+            <button onClick={() => setPage("plink")}>Plink</button>
           </>
         )}
       </div>

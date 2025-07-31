@@ -45,7 +45,7 @@ const Crash: React.FC = ({
     const elapsed = (timestamp - startTimeRef.current) / 1000; // in seconds
 
     // Curve: a fast-growing exponential curve
-    const newMultiplier = 1 + Math.pow(elapsed, 1.5) * 0.5;
+    const newMultiplier = (1 + Math.pow(elapsed, 1.2) * 0.5) -1 ;
 
     if (newMultiplier >= crashPoint) {
       setMultiplier(crashPoint);

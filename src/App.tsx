@@ -6,6 +6,7 @@ import useLocalStorage from "./hooks/useLocalStorage";
 import SlotMachine from "./components/SlotMachine";
 import Crash from "./components/Crash.tsx";
 import Bank from "./components/Bank";
+import PlinkGame from "./components/Plinko.tsx";
 
 function App() {
   const [page, setPage] = useState("blackjack");
@@ -55,6 +56,8 @@ function App() {
         return gameOver();
       case "crash":
         return <Crash balance={balance} setBalance={updateBalance} />;
+      case "plink":
+        return <PlinkGame balance={balance} setBalance={updateBalance} />;
     }
   }
 
