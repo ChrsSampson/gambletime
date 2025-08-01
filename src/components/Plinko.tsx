@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import Matter, { Body, Engine } from "matter-js";
+import Matter, { Body, Composite, Engine } from "matter-js";
 import AudioPlayer from "./ui/AudioPlayer";
 
 const Controls: React.FC<{
   onDrop: () => void;
   bet: number;
   setBet: (v: number) => void;
-}> = ({ onDrop, bet, setBet }) => (
-  <div className="flex justify-center my-4">
+}> = ({ onDrop, bet, setBet }) => {
+  
+  return (
+  <div className="flex justify-center my-4 gap-2">
     <input
       value={bet}
       className="border p-1 rounded"
@@ -19,9 +21,9 @@ const Controls: React.FC<{
     >
       Drop Ball
     </button>
-    <button onClick={() => setBet((prev) => Number(prev) * 2)}>2X</button>
+    <button onClick={() => setBet((prev) => Number(prev) * Number(2))}>2X</button>
   </div>
-);
+)};
 
 const PlinkoWorld: React.FC<{
   engine: Matter.Engine;
@@ -148,10 +150,15 @@ const PlinkGame: React.FC<{
   function handlePayout(multiplier: Number) {
     const result = Number(bet) * Number(multiplier);
 
-    const newBalance = Number(getBalance()) + Number(result) - Number(bet);
+    const bodies = Composite.allBodies(engineRef.current.world)
+    const balls = bodies.filter(body => body.label === 'ball');
 
-     console.log(getBalance(), '+', result, newBalance)
-    // Use functional setBalance to ensure correct concurrent updates
+    const FloatingBets = Number(balance) - (Number(bet) * Number(balls.length - 1)) // account for the cost of each active ball that has not scored yet
+
+    console.log(FloatingBets, result, bet, multiplier)
+
+    const newBalance = Number(Number(getBalance()) - Number(FloatingBets)) + Number(result)
+
     setBalance(newBalance);
 
     handleNewResult(result);

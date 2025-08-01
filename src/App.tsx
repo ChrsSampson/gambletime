@@ -7,6 +7,7 @@ import SlotMachine from "./components/SlotMachine";
 import Crash from "./components/Crash.tsx";
 import Bank from "./components/Bank";
 import PlinkGame from "./components/Plinko.tsx";
+import Wheel from "./components/Wheel.tsx";
 
 function App() {
   const [page, setPage] = useState("blackjack");
@@ -60,6 +61,8 @@ function App() {
         return <Crash balance={balance} setBalance={updateBalance} />;
       case "plink":
         return <PlinkGame balance={balance} setBalance={updateBalance} />;
+      case "spin":
+        return <Wheel balance={balance} setBalance={updateBalance} />;
     }
   }
 

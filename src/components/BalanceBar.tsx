@@ -16,11 +16,11 @@ export default function BalanceBar({
             <NavButton text="Slots" value="slot" currentPage={page} setPage={setPage} />
             <NavButton text="Stonks" value="crash" currentPage={page} setPage={setPage} />
             <NavButton text="PlinkWorld" value="plink" currentPage={page} setPage={setPage} />
-            {/* <NavButton text="slots" value="slot" currentPage={page} setPage={setPage} /> */}
+            <NavButton text="Fruit Spin" value="spin" currentPage={page} setPage={setPage} />
           </>
         )}
       </div>
-      <h4 className="border-1 rounded px-4 px-2 text-lg">
+      <h4 className="border-1 rounded px-4 text-lg">
         Balance: ${balance}
       </h4>
     </nav>
