@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Matter, { Body, Engine } from "matter-js";
+import AudioPlayer from "./ui/AudioPlayer";
 
 const Controls: React.FC<{
   onDrop: () => void;
@@ -132,13 +133,13 @@ const PlinkGame: React.FC<{
   balance: Number;
   setBalance: (v: Number) => void;
 }> = ({ balance, setBalance }) => {
+
   const engineRef = useRef(Matter.Engine.create());
   const runnerRef = useRef(Matter.Runner.create());
-  const [score, setScore] = useState(0);
-  const [balls, setBalls] = useState<Matter.Body[]>([]);
   const scoredBallsRef = useRef<Set<number>>(new Set()); // Track scored ball IDs
   const [bet, setBet] = useState<number>(10);
   const [results, setResults] = useState<[any?]>([]);
+  const audioRef = useRef()
 
   const bucketScores = [20, 10, 2, 0.5, 0.2, 0.1, 0.1, 0.2, 0.5, 2, 10, 20];
   const width = 400;
@@ -148,6 +149,8 @@ const PlinkGame: React.FC<{
     const result = Number(bet) * Number(multiplier);
 
     const newBalance = Number(getBalance()) + Number(result) - Number(bet);
+
+     console.log(getBalance(), '+', result, newBalance)
     // Use functional setBalance to ensure correct concurrent updates
     setBalance(newBalance);
 
@@ -168,6 +171,9 @@ const PlinkGame: React.FC<{
     Matter.Runner.run(runnerRef.current, engine);
 
     Matter.Events.on(engine, "collisionStart", function (event) {
+      // play audio for ball collision
+      audioRef.current.play()
+
       for (const pair of event.pairs) {
         const { bodyA, bodyB } = pair;
 
@@ -232,6 +238,7 @@ const PlinkGame: React.FC<{
       <div className="flex justify-center mt-4">
         <PlinkoWorld engine={engineRef.current} bucketScores={bucketScores} />
       </div>
+      <AudioPlayer ref={audioRef} src="/sounds/ballClick.mp3" volume={0.2} />
     </div>
   );
 };

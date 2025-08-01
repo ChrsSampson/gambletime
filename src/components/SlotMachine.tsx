@@ -119,18 +119,18 @@ const [bet, setBet] = useState(1)
       <div className="flex gap-2 justify-center place-items-center">
         <button
             onClick={spinReels}
-            disabled={isSpinning || bet < 0}
+            disabled={isSpinning || bet <= 0}
             className="w-[10em] py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300"
         >
             
             {isSpinning ? 'Spinning...' : 'Spin'}
         </button>
-            <button>2X</button>
+        <button disabled={bet >= 500 || isSpinning} onClick={() => updateBet(bet * 2)}>2X</button>
     </div>
       <div className="text-center mt-4">
         <div className="flex gap-2 justify-center place-items-center">
           <label className="text-xl font-bold">Bet</label>
-        <input className="border rounded p-1 disabled:text-grey-300 disabled-border-grey-300" placeholder="Bet" disabled={isSpinning} max={500} value={bet} onChange={(e) => updateBet(e.target.value)} />
+        <input className="border rounded p-1 disabled:text-gray-400 disabled:bg-gray-500 disabled:cursor-not-allowed" placeholder="Bet" disabled={isSpinning} max={500} value={bet} onChange={(e) => updateBet(e.target.value)} />
         </div>
         <p className="text-sm text-gray-600">Max Bet $500</p>
         <p className="text-sm text-gray-600">Spins since last win: {spinCount}</p>

@@ -14,14 +14,17 @@ const BlackjackGame = ({
   const [dealerHand, setDealerHand] = useState<Card[]>([]);
   const [isGameOver, setIsGameOver] = useState(true);
   const [message, setMessage] = useState(""); // Starting balance
-  const [bet, setBet] = useState(0); // Current bet
+  const [bet, setBet] = useState(10); // Current bet
 
   useEffect(() => {
-    startGame();
+    if (bet <= 0) {
+      setMessage("Please place a valid bet.");
+      return;
+    }
   }, []);
 
   const startGame = () => {
-    if (bet <= 0 || bet > balance) {
+    if (bet <= 0) {
       setMessage("Please place a valid bet.");
       return;
     }
@@ -170,6 +173,7 @@ const BlackjackGame = ({
       ) : (
         <div className="mt-4 space-y-2">
           <button
+            disabled={bet <= 0}
             onClick={startGame}
             className="px-4 py-2 bg-gray-700 text-white rounded"
           >

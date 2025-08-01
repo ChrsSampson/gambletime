@@ -12,6 +12,7 @@ function App() {
   const [page, setPage] = useState("blackjack");
   const [balance, setBalance] = useLocalStorage("balance", 1000);
   const [inbank, setInBank] = useState(false);
+  const [bankruptcies, setBankruptcies] = useLocalStorage('bankruptcies', 0);
 
   const updateBalance = (v: any) => {
     console.log(typeof v, v);
@@ -39,6 +40,7 @@ function App() {
 
   useEffect(() => {
     if (balance <= 0) {
+      setBankruptcies(bankruptcies + 1)
       setPage("gameover");
       // getPage()
     }
@@ -63,7 +65,7 @@ function App() {
 
   return (
     <main className="min-h-screen min-w-screen text-white flex flex-col items-center justify-center">
-      <BalanceBar setPage={setPage} balance={balance} />
+      <BalanceBar setPage={setPage} balance={balance} page={page} />
       {getPage()}
     </main>
   );

@@ -29,6 +29,9 @@ const Crash: React.FC = ({
   const lastValueRef = useRef<number>(0.0);
 
   const startGame = () => {
+    const newBalance = Number(balance) - Number(bet)
+    setBalance(newBalance) // take money at the start of the game
+
     const point = getRandomCrashPoint();
     setCrashPoint(point);
     setMultiplier(0.0);
@@ -52,7 +55,7 @@ const Crash: React.FC = ({
       setGameState("crashed");
       cancelAnimationFrame(animationRef.current!);
       //   player lose
-      setBalance(Number((balance -= bet)));
+      setBalance(Number((balance -= Number(bet))));
       return;
     }
 
@@ -66,11 +69,21 @@ const Crash: React.FC = ({
       setCashOut(lastValueRef.current);
       setGameState("crashed");
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
-      // payout
-      const win = calculateWin();
-      const r = Number(balance) + Number(win);
-      setWinAmount(win);
-      setBalance(r);
+
+      if(multiplier < 1.0){
+        // lose
+        // const p = 100 / Number(multiplier) 
+        const a = Number(multiplier) * Number(bet)
+        const b = Number(balance) + Number(a)
+        setWinAmount(Number(a).toFixed(2)) // bullshit linting error
+        setBalance(b)
+      } else {
+        // payout
+        const win = calculateWin();
+        const r = Number(balance) + Number(win);
+        setWinAmount(win);
+        setBalance(r);
+      }
     }
   };
 
@@ -121,8 +134,9 @@ const Crash: React.FC = ({
                 : `💥 Crashed at ${multiplier.toFixed(2)}x`}
             </div>
             <button
+              disabled={Number(bet) <= 0}
               onClick={startGame}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded"
+              className="px-6 py-2"
             >
               Play Again
             </button>
@@ -130,9 +144,11 @@ const Crash: React.FC = ({
         )}
       </div>
       <input
+        disabled={gameState == "running"}
+        type="number"
         value={bet}
         onChange={(e) => setBet(e.target.value)}
-        className="border p-1 rounded"
+        className="border p-1 rounded disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-400"
         placeholder="Bet"
       />
     </div>
