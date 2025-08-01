@@ -1,18 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Matter, { Body, Engine } from 'matter-js';
+import React, { useEffect, useRef, useState } from "react";
+import Matter, { Body, Engine } from "matter-js";
 
-const Controls: React.FC<{ onDrop: () => void, bet:number, setBet:(v:number) => void }> = ({ onDrop, bet, setBet }) => (
+const Controls: React.FC<{
+  onDrop: () => void;
+  bet: number;
+  setBet: (v: number) => void;
+}> = ({ onDrop, bet, setBet }) => (
   <div className="flex justify-center my-4">
-    <input value={bet} className="border p-1 rounded" onChange={(e) => setBet(Number(e.target.value))} />
+    <input
+      value={bet}
+      className="border p-1 rounded"
+      onChange={(e) => setBet(Number(e.target.value))}
+    />
     <button
       className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
       onClick={onDrop}
     >
       Drop Ball
     </button>
-    <button onClick={() => setBet(prev => Number(prev) * 2)}>
-        2X
-    </button>
+    <button onClick={() => setBet((prev) => Number(prev) * 2)}>2X</button>
   </div>
 );
 
@@ -34,7 +40,7 @@ const PlinkoWorld: React.FC<{
         width,
         height,
         wireframes: false,
-        background: '#14151f',
+        background: "#14151f",
       },
     });
 
@@ -43,7 +49,10 @@ const PlinkoWorld: React.FC<{
       for (let col = 0; col < cols; col++) {
         const x = row % 2 === 0 ? col * spacing : col * spacing + spacing / 2;
         const y = row * spacing + 40;
-        const peg = Matter.Bodies.circle(x, y, 5, { isStatic: true, render: {fillStyle: '#fff'} });
+        const peg = Matter.Bodies.circle(x, y, 5, {
+          isStatic: true,
+          render: { fillStyle: "#fff" },
+        });
         Matter.World.add(engine.world, peg);
       }
     }
@@ -51,26 +60,48 @@ const PlinkoWorld: React.FC<{
     // Bucket dividers
     for (let i = 0; i <= cols; i++) {
       const x = i * spacing;
-      const divider = Matter.Bodies.rectangle(x, height - 25, 2, 100, { isStatic: true, render: {fillStyle: '#fff'} });
+      const divider = Matter.Bodies.rectangle(x, height - 25, 2, 100, {
+        isStatic: true,
+        render: { fillStyle: "#fff" },
+      });
       Matter.World.add(engine.world, divider);
     }
 
     // Slightly offset side walls to avoid sticky edges
     // Borders
     // Borders with angled side walls
-    const topWall = Matter.Bodies.rectangle(width / 2, -20, width, 20, { isStatic: true });
-    const bottomWall = Matter.Bodies.rectangle(width / 2, height + 40, width, 20, { isStatic: true, label: 'ground' });
+    const topWall = Matter.Bodies.rectangle(width / 2, -20, width, 20, {
+      isStatic: true,
+    });
+    const bottomWall = Matter.Bodies.rectangle(
+      width / 2,
+      height + 40,
+      width,
+      20,
+      { isStatic: true, label: "ground" }
+    );
 
     // side walls (off screen to prevent balls from getting stuck)
-    const leftWall = Matter.Bodies.rectangle(-20, height / 2, 20, height * 1.2, {
-    isStatic: true,
-    });
-    const rightWall = Matter.Bodies.rectangle(width + 20, height / 2, 20, height * 1.2, {
-    isStatic: true,
-    });
+    const leftWall = Matter.Bodies.rectangle(
+      -20,
+      height / 2,
+      20,
+      height * 1.2,
+      {
+        isStatic: true,
+      }
+    );
+    const rightWall = Matter.Bodies.rectangle(
+      width + 20,
+      height / 2,
+      20,
+      height * 1.2,
+      {
+        isStatic: true,
+      }
+    );
 
-    Matter.World.add(engine.world, [topWall,bottomWall, leftWall, rightWall]);
-
+    Matter.World.add(engine.world, [topWall, bottomWall, leftWall, rightWall]);
 
     Matter.Render.run(render);
 
@@ -97,75 +128,68 @@ const PlinkoWorld: React.FC<{
   );
 };
 
-const PlinkGame: React.FC<{balance:Number, setBalance: (v:Number) => void}> = ({balance, setBalance}) => {
+const PlinkGame: React.FC<{
+  balance: Number;
+  setBalance: (v: Number) => void;
+}> = ({ balance, setBalance }) => {
   const engineRef = useRef(Matter.Engine.create());
   const runnerRef = useRef(Matter.Runner.create());
   const [score, setScore] = useState(0);
   const [balls, setBalls] = useState<Matter.Body[]>([]);
   const scoredBallsRef = useRef<Set<number>>(new Set()); // Track scored ball IDs
   const [bet, setBet] = useState<number>(10);
-  const [results, setResults] = useState<[any?]>([])
+  const [results, setResults] = useState<[any?]>([]);
 
   const bucketScores = [20, 10, 2, 0.5, 0.2, 0.1, 0.1, 0.2, 0.5, 2, 10, 20];
   const width = 400;
   const spacing = width / bucketScores.length;
 
-  function handlePayout(v:Number){
-        console.log('starting', balance)
-        const result = Number(bet) * Number(v)
-        const newBalance = Number(balance) + Number(result)
-        console.log (bet, 'x', v, result)
-        console.log(balance, '+' , result, '=', newBalance);
-        setBalance(newBalance)
-        handleNewResult(result)
-    }
+  function handlePayout(multiplier: Number) {
+    const result = Number(bet) * Number(multiplier);
 
-    function handleNewResult(v:Number){
-        const arr = [...results, v]
-        setResults(arr)
-    }
+    const newBalance = Number(getBalance()) + Number(result) - Number(bet);
+    // Use functional setBalance to ensure correct concurrent updates
+    setBalance(newBalance);
+
+    handleNewResult(result);
+  }
+
+  function getBalance() {
+    return balance;
+  }
+
+  function handleNewResult(v: Number) {
+    const arr = [...results, v];
+    setResults(arr);
+  }
 
   useEffect(() => {
     const engine = engineRef.current;
     Matter.Runner.run(runnerRef.current, engine);
 
-    // this is a terrible way to detect if balls are in a location
-    // setBalls(prevBalls => {
-    //   const newBalls: Matter.Body[] = [];
+    Matter.Events.on(engine, "collisionStart", function (event) {
+      for (const pair of event.pairs) {
+        const { bodyA, bodyB } = pair;
 
-    //   for (const ball of prevBalls) {
-    //     const id = ball.id;
+        const isGroundA = bodyA.label === "ground";
+        const isGroundB = bodyB.label === "ground";
 
-    //     if (
-    //       ball.position.y > 550 &&
-    //       ball.speed < 0.2 &&
-    //       !scoredBallsRef.current.has(id)
-    //     ) {
-    //       const bucketIndex = Math.floor(ball.position.x / spacing);
-    //       // const points = bucketScores[bucketIndex] || 0;
-    //       // scoredBallsRef.current.add(id);
-    //       // Matter.World.remove(engine.world, ball); // Remove from world
-    //       // handlePayout(Number(points));
-    //     } else {
-    //       if (!scoredBallsRef.current.has(id)) {
-    //         newBalls.push(ball); // Keep active ones
-    //       }
-    //     }
-    //   }
+        if (isGroundA || isGroundB) {
+          const ball = isGroundA ? bodyB : bodyA;
 
-    //   return newBalls;
-    // });
+          // Ensure ball is not already scored
+          if (!scoredBallsRef.current.has(ball.id)) {
+            scoredBallsRef.current.add(ball.id);
 
-    // use the matter collistion detection to figure out when a ball hits the bucket
-    Matter.Events.on(engine, "collisionStart", function (event){
-      if(event.pairs[0].bodyA.label == "ground") {
-        const ball = event.pairs[0].bodyB
-        Matter.World.remove(engine.world, event.pairs[1].bodyB)
-        const bucketIndex = Math.floor(ball.position.x / spacing);
-        const points = bucketScores[bucketIndex] || 0;
-        handlePayout(Number(points));
+            const bucketIndex = Math.floor(ball.position.x / spacing);
+            const points = bucketScores[bucketIndex] || 0;
+
+            handlePayout(points);
+            Matter.World.remove(engine.world, ball);
+          }
+        }
       }
-    })
+    });
 
     return () => {
       Matter.Runner.stop(runnerRef.current);
@@ -174,23 +198,18 @@ const PlinkGame: React.FC<{balance:Number, setBalance: (v:Number) => void}> = ({
 
   const handleDrop = () => {
     // take money for the ball
-    const newBalance = Number(balance) - bet
-    setBalance(Number(newBalance))
+    const newBalance = Number(balance) - bet;
+    setBalance(Number(newBalance));
 
     const engine = engineRef.current;
     const { Bodies, World } = Matter;
 
-    const ball = Bodies.circle(
-      200 + (Math.random() - 0.5) * 50,
-      20,
-      10,
-      {
-        restitution: 0.6,
-        friction: 0.005,
-        render: { fillStyle: '#e11d48' },
-        label: "ball"
-      }
-    );
+    const ball = Bodies.circle(200 + (Math.random() - 0.5) * 50, 20, 10, {
+      restitution: 0.6,
+      friction: 0.005,
+      render: { fillStyle: "#e11d48" },
+      label: "ball",
+    });
 
     World.add(engine.world, ball);
     // setBalls(prev => [...prev, ball]);
@@ -200,14 +219,14 @@ const PlinkGame: React.FC<{balance:Number, setBalance: (v:Number) => void}> = ({
     <div className="w-fit text-white border rounded p-4">
       <h1 className="text-center text-3xl font-bold pt-6">Plink World</h1>
       <div className="flex mt-2 min-h-[2em]">
-        {results[0] && results.map(v => {
-            console.log(v)
-            const goodStyle = "border rounded p-1 min-w-[1.5em] bg-green-600"
+        {results[0] &&
+          results.map((v) => {
+            const goodStyle = "border rounded p-1 min-w-[1.5em] bg-green-600";
 
-            const badStyle= "border rounded p-1 min-w-[1.5em] bg-red-600"
+            const badStyle = "border rounded p-1 min-w-[1.5em] bg-red-600";
 
-            return (<p className={v > bet ? goodStyle : badStyle}>${v}</p>)
-        }) }
+            return <p className={v > bet ? goodStyle : badStyle}>${v}</p>;
+          })}
       </div>
       <Controls bet={bet} setBet={setBet} onDrop={handleDrop} />
       <div className="flex justify-center mt-4">
