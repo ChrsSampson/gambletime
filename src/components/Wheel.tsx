@@ -1,10 +1,20 @@
 // src/components/WheelOfFortune.tsx
-import React, { useEffect, useRef, useState } from 'react';
-import Matter from 'matter-js';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
+import Matter from "matter-js";
 
-const labels = ['🍎', '🍌', '🍇', '🍊', '🍉', '🍍', '🥝', '🍓'];
+const labels = ["🍎", "🍌", "🍇", "🍊", "🍉", "🍍", "🥝", "💎"];
 
-const WheelOfFortune: React.FC = () => {
+export interface WheelOfFortuneHandle {
+  spin: () => void;
+}
+
+const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const wheelRef = useRef<Matter.Body | null>(null);
@@ -15,12 +25,17 @@ const WheelOfFortune: React.FC = () => {
   const height = 400;
   const radius = 150;
 
+  useImperativeHandle(ref, () => ({
+    spin: spinWheel,
+    result: result,
+    spinning: spinning,
+  }));
+
   useEffect(() => {
     const Engine = Matter.Engine,
       Bodies = Matter.Bodies,
       Composite = Matter.Composite,
       Runner = Matter.Runner,
-      Body = Matter.Body,
       Constraint = Matter.Constraint;
 
     const engine = Engine.create();
@@ -28,7 +43,7 @@ const WheelOfFortune: React.FC = () => {
 
     const wheel = Bodies.circle(width / 2, height / 2, radius, {
       isStatic: false,
-      frictionAir: 0.02,
+      frictionAir: 0.05,
     });
     wheelRef.current = wheel;
 
@@ -45,7 +60,7 @@ const WheelOfFortune: React.FC = () => {
     Runner.run(runner, engine);
 
     let animationFrameId: number;
-    const context = canvasRef.current!.getContext('2d')!;
+    const context = canvasRef.current!.getContext("2d")!;
 
     const drawWheel = () => {
       context.clearRect(0, 0, width, height);
@@ -60,7 +75,7 @@ const WheelOfFortune: React.FC = () => {
         context.beginPath();
         context.moveTo(width / 2, height / 2);
         context.arc(width / 2, height / 2, radius, startAngle, endAngle);
-        context.fillStyle = i % 2 === 0 ? '#facc15' : '#fcd34d';  //wheel color
+        context.fillStyle = i % 2 === 0 ? "#facc15" : "#fcd34d";
         context.fill();
         context.stroke();
 
@@ -72,15 +87,15 @@ const WheelOfFortune: React.FC = () => {
         context.save();
         context.translate(textX, textY);
         context.rotate(textAngle);
-        context.fillStyle = '#000';
-        context.font = '30px sans-serif';
-        context.textAlign = 'center';
+        context.fillStyle = "#000";
+        context.font = "30px sans-serif";
+        context.textAlign = "center";
         context.fillText(labels[i], 0, 0);
         context.restore();
       }
 
       // Pointer
-      context.fillStyle = '#1e3a8a';
+      context.fillStyle = "#1e3a8a";
       context.beginPath();
       context.moveTo(width / 2, height / 2 - radius - 10);
       context.lineTo(width / 2 - 10, height / 2 - radius - 30);
@@ -114,7 +129,10 @@ const WheelOfFortune: React.FC = () => {
 
           const angle = wheelRef.current!.angle % (2 * Math.PI);
           const sliceAngle = (2 * Math.PI) / labels.length;
-          const index = Math.floor(((2 * Math.PI - angle + sliceAngle / 2) % (2 * Math.PI)) / sliceAngle);
+          const index = Math.floor(
+            ((2 * Math.PI - angle + sliceAngle / 2) % (2 * Math.PI)) /
+              sliceAngle
+          );
           setResult(labels[index]);
         }
       }, 200);
@@ -123,20 +141,14 @@ const WheelOfFortune: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-4">
-        <div>
-            <h1>Fruit Spin</h1>
-        </div>
-      <canvas ref={canvasRef} width={width} height={height} className="border-4 border-indigo-900 rounded-full" />
-      <button
-        onClick={spinWheel}
-        disabled={spinning}
-        className="px-4 py-2 disabled:opacity-50"
-      >
-        {spinning ? 'Spinning...' : 'Spin the Wheel'}
-      </button>
-      {result && <div className="text-xl font-bold text-green-700">You got: {result}!</div>}
+      <canvas
+        ref={canvasRef}
+        width={width}
+        height={height}
+        className="border-4 border-indigo-900 rounded-full"
+      />
     </div>
   );
-};
+});
 
 export default WheelOfFortune;

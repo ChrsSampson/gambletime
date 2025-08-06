@@ -8,12 +8,14 @@ import Crash from "./components/Crash.tsx";
 import Bank from "./components/Bank";
 import PlinkGame from "./components/Plinko.tsx";
 import Wheel from "./components/Wheel.tsx";
+import GameOver from "./components/GameOver.tsx";
+import DeluxSlots from "./components/DeluxeSlot.tsx";
 
 function App() {
-  const [page, setPage] = useState("blackjack");
+  const [page, setPage] = useState("deluxe");
   const [balance, setBalance] = useLocalStorage("balance", 1000);
   const [inbank, setInBank] = useState(false);
-  const [bankruptcies, setBankruptcies] = useLocalStorage('bankruptcies', 0);
+  const [bankruptcies, setBankruptcies] = useLocalStorage("bankruptcies", 0);
 
   const updateBalance = (v: any) => {
     console.log(typeof v, v);
@@ -22,26 +24,9 @@ function App() {
     setBalance(n);
   };
 
-  const gameOver = () => {
-    return (
-      <div className="text-center">
-        <h1>☠️ Good Job, Your Homeless 🗑️</h1>
-        <h3>Your not going to stop there are you?</h3>
-        <button
-          onClick={() => {
-            setInBank(true);
-            setPage("bank");
-          }}
-        >
-          Go To Bank
-        </button>
-      </div>
-    );
-  };
-
   useEffect(() => {
     if (balance <= 0) {
-      setBankruptcies(bankruptcies + 1)
+      setBankruptcies(bankruptcies + 1);
       setPage("gameover");
       // getPage()
     }
@@ -56,13 +41,21 @@ function App() {
       case "blackjack":
         return <BlackjackGame balance={balance} setBalance={updateBalance} />;
       case "gameover":
-        return gameOver();
+        return (
+          <GameOver
+            counter={bankruptcies}
+            setInBank={setInBank}
+            setPage={setPage}
+          />
+        );
       case "crash":
         return <Crash balance={balance} setBalance={updateBalance} />;
       case "plink":
         return <PlinkGame balance={balance} setBalance={updateBalance} />;
       case "spin":
         return <Wheel balance={balance} setBalance={updateBalance} />;
+      case "deluxe":
+        return <DeluxSlots />;
     }
   }
 
