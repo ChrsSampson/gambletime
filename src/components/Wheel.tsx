@@ -1,5 +1,4 @@
-// src/components/WheelOfFortune.tsx
-import React, {
+import {
   useEffect,
   useRef,
   useState,
@@ -8,27 +7,35 @@ import React, {
 } from "react";
 import Matter from "matter-js";
 
-const labels = ["🍎", "🍌", "🍇", "🍊", "🍉", "🍍", "🥝", "💎"];
+// Replace the labels array with objects that include a value:
+const labels = [
+  { icon: "🍎", value: 0.1 },
+  { icon: "🍌", value: 0.2 },
+  { icon: "🆓", value: 'b' },
+  { icon: "🍊", value: 0.3 },
+  { icon: "🍉", value: .5 },
+  { icon: "🍍", value: .5 },
+  { icon: "🥝", value: 1 },
+  { icon: "💎", value: 5 }
+];
 
 export interface WheelOfFortuneHandle {
   spin: () => void;
 }
 
-const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
+const WheelOfFortune = forwardRef<WheelOfFortuneHandle>(({handleRestult, wipeResult}, ref) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
   const wheelRef = useRef<Matter.Body | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
 
-  const width = 400;
-  const height = 400;
-  const radius = 150;
+  const width = 200;
+  const height = 200;
+  const radius = 75;
 
   useImperativeHandle(ref, () => ({
-    spin: spinWheel,
-    result: result,
-    spinning: spinning,
+    spin: spinWheel
   }));
 
   useEffect(() => {
@@ -52,7 +59,7 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
       bodyA: wheel,
       pointB: { x: width / 2, y: height / 2 },
       length: 0,
-      stiffness: 1,
+      stiffness: 2,
     });
 
     Composite.add(engine.world, [wheel, pin, constraint]);
@@ -65,7 +72,8 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
     const drawWheel = () => {
       context.clearRect(0, 0, width, height);
       const anglePerSlice = (2 * Math.PI) / labels.length;
-      const angle = wheel.angle;
+      // Always get the latest angle from the ref
+      const angle = wheelRef.current!.angle;
 
       // Draw segments
       for (let i = 0; i < labels.length; i++) {
@@ -75,22 +83,27 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
         context.beginPath();
         context.moveTo(width / 2, height / 2);
         context.arc(width / 2, height / 2, radius, startAngle, endAngle);
-        context.fillStyle = i % 2 === 0 ? "#facc15" : "#fcd34d";
+
+       
+        context.fillStyle = i % 2 === 0 ? "#4d4d4d" : "#111827";
+
         context.fill();
         context.stroke();
 
         // Label
         const textAngle = startAngle + anglePerSlice / 2;
-        const textX = width / 2 + (radius - 40) * Math.cos(textAngle);
-        const textY = height / 2 + (radius - 40) * Math.sin(textAngle);
+        const textX = width / 2 + (radius - 30) * Math.cos(textAngle);
+        const textY = height / 2 + (radius - 30) * Math.sin(textAngle);
 
         context.save();
         context.translate(textX, textY);
-        context.rotate(textAngle);
-        context.fillStyle = "#000";
-        context.font = "30px sans-serif";
+        // Rotate so text is always upright
+        context.rotate(textAngle + Math.PI / 2);
+        context.fillStyle = "#fff";
+        context.font = "28px sans-serif";
         context.textAlign = "center";
-        context.fillText(labels[i], 0, 0);
+        context.textBaseline = "middle";
+        context.fillText(labels[i].icon, 0, 0);
         context.restore();
       }
 
@@ -113,31 +126,54 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
       Composite.clear(engine.world, false);
       Matter.Engine.clear(engine);
     };
+
+    
   }, []);
+
+  
 
   const spinWheel = () => {
     if (wheelRef.current && !spinning) {
       setSpinning(true);
       setResult(null);
       Matter.Body.setAngularVelocity(wheelRef.current, Math.random() * 1.5 + 1);
-
       const checkStop = setInterval(() => {
         const velocity = Math.abs(wheelRef.current!.angularVelocity);
-        if (velocity < 0.002) {
+
+        if (velocity < 0.005) {
           clearInterval(checkStop);
           setSpinning(false);
+          Matter.Body.setAngularVelocity(wheelRef.current!, 0);
 
-          const angle = wheelRef.current!.angle % (2 * Math.PI);
+          // Pointer is at top: -Math.PI/2
+          const pointerAngle = -Math.PI / 2;
+          const wheelAngle = wheelRef.current!.angle % (2 * Math.PI);
           const sliceAngle = (2 * Math.PI) / labels.length;
-          const index = Math.floor(
-            ((2 * Math.PI - angle + sliceAngle / 2) % (2 * Math.PI)) /
-              sliceAngle
-          );
+
+          // Calculate the angle under the pointer
+          let relativeAngle = (pointerAngle - wheelAngle + 2 * Math.PI) % (2 * Math.PI);
+          let index = Math.floor(relativeAngle / sliceAngle) % labels.length;
+          if (index < 0) index += labels.length;
+
           setResult(labels[index]);
         }
-      }, 200);
+      }, 0.2);
     }
   };
+
+  useEffect(() => {
+   
+    if(result) {
+      handleRestult(result)
+      console.log("Result:", result);
+    }
+  }, [result])
+
+  useEffect(() => {
+    if(spinning) {
+      wipeResult()
+    }
+  }, [spinning])
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -145,7 +181,6 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>((_, ref) => {
         ref={canvasRef}
         width={width}
         height={height}
-        className="border-4 border-indigo-900 rounded-full"
       />
     </div>
   );

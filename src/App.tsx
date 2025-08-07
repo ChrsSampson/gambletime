@@ -12,7 +12,7 @@ import GameOver from "./components/GameOver.tsx";
 import DeluxSlots from "./components/DeluxeSlot.tsx";
 
 function App() {
-  const [page, setPage] = useState("deluxe");
+  const [page, setPage] = useState("spin");
   const [balance, setBalance] = useLocalStorage("balance", 1000);
   const [inbank, setInBank] = useState(false);
   const [bankruptcies, setBankruptcies] = useLocalStorage("bankruptcies", 0);
@@ -53,9 +53,7 @@ function App() {
       case "plink":
         return <PlinkGame balance={balance} setBalance={updateBalance} />;
       case "spin":
-        return <Wheel balance={balance} setBalance={updateBalance} />;
-      case "deluxe":
-        return <DeluxSlots />;
+        return <DeluxSlots balance={balance} setBalance={updateBalance} />;
     }
   }
 
