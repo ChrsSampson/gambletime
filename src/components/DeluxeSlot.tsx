@@ -1,17 +1,25 @@
-
-import Wheel from "./Wheel";
+import useLocalStorage from "../hooks/useLocalStorage";
+import Wheel from "./ui/Wheel";
 import { useEffect, useRef, useState } from "react";
+import AudioPlayer from "./ui/AudioPlayer";
 
 const placeholderIcon = { icon: '❓', value: null };
 
 export default function DeluxeSlot({balance, setBalance}: {balance: number, setBalance: (v:number) => void}) {
-  const wheelRefs = [useRef(null), useRef(null), useRef(null)];
-  const [results, setResult] = useState(Array(3).fill(placeholderIcon));
+  const wheelRefs = [useRef(null), useRef(null), useRef(null),useRef(null)];
+  const [results, setResult] = useState(Array(4).fill(placeholderIcon));
   const [bet,setBet] = useState(10);
-  const [freeSpins, setFreeSpins] = useState(0);
+  const [freeSpins, setFreeSpins] = useLocalStorage("freeSpins", 0);
   const [message, setMessage] = useState("");
 
   function handleResult(index: number, value: any) {
+
+    console.log("Result:", value, Date.now());
+
+    if(value.icon === null){
+      wheelRefs[index].current?.spin();
+    }
+
     const newResults = [...results];
     newResults[index] = value;
     setResult(newResults);
@@ -29,35 +37,53 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
 
   function takeMoney() {
     // take the users bet
-    const betAmount = Number(bet);
-    setBalance(balance - betAmount);
+    if(freeSpins > 0) {
+      setFreeSpins(freeSpins - 1);
+    } else {
+      const betAmount = Number(bet);
+      setBalance(balance - betAmount);
+    }
   }
 
   function calculateWinnings() {
-    // for each icon, multiply the bet by the value of the icon unless its a bonus
-    // if value is less than 1, add that pervious icon to the total
-    // if all three icons match and are not bonus, multiply the result by 10
+    const values = results.map(r => r.value);
+    const uniqueValues = new Set(values);
     let total = 0;
-    if( results.every((result) => {result.icon === results[0].icon}) ) {
-      if(results[0].value == 'b') {
-        // if all three are bonus, give 3 free spins
-        setFreeSpins(freeSpins + 10);
-        setMessage(`You won 10 free spins!`);
-        return;
-      } else {
-        // if all three match, multiply the bet by 10
-        total = Number(results[0].value) * 10 * Number(bet);
-        setMessage(`You won $${total}!`);
+    let bonusCount = 0;
+
+    // Count bonus icons
+    for (let i = 0; i < values.length; i++) {
+      if (values[i] === 'b') {
+        bonusCount += 1;
       }
-    } else {
-      results.forEach((result) => {
-        if (result.value !== null && result.value !== 'b') {
-         const n = (Number(result.value) / Number(bet)).toFixed(2);
-         total = Number(total) + Number(n);
-        }
-      });
-      setMessage(`You won $${total}!`);
     }
+
+    // If any bonus, only award bonus spins, no payout
+    if (bonusCount > 0) {
+      setFreeSpins(freeSpins + bonusCount);
+      setMessage(`You got ${bonusCount} bonus spin${bonusCount > 1 ? 's' : ''}!`);
+      return;
+    }
+
+    // calculate non-bonus winnings
+    let multiplier = 0;
+    results.forEach((result) => {
+      multiplier += result.value || 0;
+    })
+
+    total = Number(bet) * multiplier
+
+    // Jackpot: all three match and are not bonus
+    const isJackpot = uniqueValues.size === 1;
+
+    if (isJackpot) {
+      total *= 10;
+      setMessage(`JACKPOT! You won ${total.toFixed(2)}!`);
+    } else {
+      setMessage(`You won ${total.toFixed(2)}!`);
+    }
+
+    setBalance(balance + total);
   }
 
   useEffect(() => {
@@ -72,12 +98,12 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
       <h1 className="text-center font-bold pb-1">Fruit Spin</h1>
       <p className="italic text-center">A winner every time</p>
       </div>
-      <div className="text-center text-3xl min-h-[1.5em] py-2 border rounded max-w-[5em] mx-auto mb-2">
+      <div className="text-center text-3xl min-h-[1.5em] py-2 border rounded max-w-[6em] mx-auto mb-2">
         {results.map((v, i) => (
-          <span key={i + v.icon}>{v.icon}</span>
+          <span key={Date.now()+i}>{v.icon}</span>
         ))}
       </div>
-      <p className="min-h-[1.25em] text-center">{message}</p>
+        <p className="min-h-[1.5em] text-center">{message}</p>
       <div className="flex gap-2">
         {wheelRefs.map((ref, index) => (
           <Wheel
@@ -88,13 +114,15 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
           />
         ))}
       </div>
-      <div className="flex gap-2 justify-center">
+      <div className="flex gap-2 justify-center place-items-center">
         <button onClick={handleSpin}>Spin</button>
-        <input disabled={freeSpins > 0} className="border rounded p-1" placeholder="Bet..." value={bet} onChange={(e) => setBet(e.target.value)} />
+        <input disabled={freeSpins > 0} className="border rounded p-1 disabled:text-gray-300 disabled:border-gray-400 disabled:bg-gray-600" placeholder="Bet..." value={bet} onChange={(e) => setBet(e.target.value)} />
         { freeSpins > 0 &&
-          <span className="bold">Bonus Spins: {freeSpins}</span>
+          <span className="bold text-lg font-bold">Bonus Spins: {freeSpins}</span>
         }
       </div>
+      <sub className="italic text-center">Bets are locked in during bonus spins</sub>
+      <AudioPlayer src="/sounds/single-click.mp3" />
     </div>
   );
 }

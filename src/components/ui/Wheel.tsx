@@ -9,14 +9,14 @@ import Matter from "matter-js";
 
 // Replace the labels array with objects that include a value:
 const labels = [
-  { icon: "🍎", value: 0.1 },
-  { icon: "🍌", value: 0.2 },
+  { icon: "🍎", value: 0.01 },
+  { icon: "🍌", value: 0.02 },
   { icon: "🆓", value: 'b' },
-  { icon: "🍊", value: 0.3 },
-  { icon: "🍉", value: .5 },
-  { icon: "🍍", value: .5 },
-  { icon: "🥝", value: 1 },
-  { icon: "💎", value: 5 }
+  { icon: "🍊", value: 0.03 },
+  { icon: "🍉", value: .05 },
+  { icon: "🍍", value: .25 },
+  { icon: "🥝", value: 0.7 },
+  { icon: "💎", value: .9 }
 ];
 
 export interface WheelOfFortuneHandle {
@@ -108,7 +108,7 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>(({handleRestult, wipeRes
       }
 
       // Pointer
-      context.fillStyle = "#1e3a8a";
+      context.fillStyle = "#e7000b";
       context.beginPath();
       context.moveTo(width / 2, height / 2 - radius - 10);
       context.lineTo(width / 2 - 10, height / 2 - radius - 30);
@@ -136,11 +136,12 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>(({handleRestult, wipeRes
     if (wheelRef.current && !spinning) {
       setSpinning(true);
       setResult(null);
-      Matter.Body.setAngularVelocity(wheelRef.current, Math.random() * 1.5 + 1);
+      Matter.Body.setAngularVelocity(wheelRef.current, Math.random() * 3 + 1);
+      console.log(Matter.Body.getAngularVelocity(wheelRef.current));
       const checkStop = setInterval(() => {
         const velocity = Math.abs(wheelRef.current!.angularVelocity);
 
-        if (velocity < 0.005) {
+        if (velocity < 0.002) {
           clearInterval(checkStop);
           setSpinning(false);
           Matter.Body.setAngularVelocity(wheelRef.current!, 0);
@@ -157,15 +158,13 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>(({handleRestult, wipeRes
 
           setResult(labels[index]);
         }
-      }, 0.2);
+      }, 0.5);
     }
   };
 
   useEffect(() => {
-   
-    if(result) {
+    if(result && !spinning) {
       handleRestult(result)
-      console.log("Result:", result);
     }
   }, [result])
 

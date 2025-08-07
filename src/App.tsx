@@ -7,7 +7,7 @@ import SlotMachine from "./components/SlotMachine";
 import Crash from "./components/Crash.tsx";
 import Bank from "./components/Bank";
 import PlinkGame from "./components/Plinko.tsx";
-import Wheel from "./components/Wheel.tsx";
+import Wheel from "./components/ui/Wheel.tsx";
 import GameOver from "./components/GameOver.tsx";
 import DeluxSlots from "./components/DeluxeSlot.tsx";
 
@@ -17,11 +17,10 @@ function App() {
   const [inbank, setInBank] = useState(false);
   const [bankruptcies, setBankruptcies] = useLocalStorage("bankruptcies", 0);
 
-  const updateBalance = (v: any) => {
+  const updateBalance = (v: Number) => {
     console.log(typeof v, v);
-
-    const n = Number(v).toFixed(2);
-    setBalance(n);
+    const n = Number(v).toFixed(2); // normalize to 2 decimal places
+    setBalance(Number(n)); // ensure it's a number
   };
 
   useEffect(() => {

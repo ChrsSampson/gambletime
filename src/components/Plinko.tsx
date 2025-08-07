@@ -147,21 +147,15 @@ const PlinkGame: React.FC<{
   const width = 400;
   const spacing = width / bucketScores.length;
 
-  function handlePayout(multiplier: Number) {
-    const result = Number(bet) * Number(multiplier);
-
-    const bodies = Composite.allBodies(engineRef.current.world)
-    const balls = bodies.filter(body => body.label === 'ball');
-
-    const FloatingBets = Number(balance) - (Number(bet) * Number(balls.length - 1)) // account for the cost of each active ball that has not scored yet
-
-    console.log(FloatingBets, result, bet, multiplier)
-
-    const newBalance = Number(Number(getBalance()) - Number(FloatingBets)) + Number(result)
-
-    setBalance(newBalance);
-
+  function handlePayout(multiplier: number) {
+    let result = 0;
+    if (multiplier < 1) {
+      result = Number(bet) * Number(multiplier);
+    } else {
+      result = Number(bet) * Number(multiplier) + bet;
+    }
     handleNewResult(result);
+    setBalance(prev => Number(prev) + Number(result)); // <-- Use functional update
   }
 
   function getBalance() {
@@ -211,7 +205,7 @@ const PlinkGame: React.FC<{
 
   const handleDrop = () => {
     // take money for the ball
-    const newBalance = Number(balance) - bet;
+    const newBalance = Number(balance) - Number(bet);
     setBalance(Number(newBalance));
 
     const engine = engineRef.current;
@@ -233,12 +227,12 @@ const PlinkGame: React.FC<{
       <h1 className="text-center text-3xl font-bold pt-6">Plink World</h1>
       <div className="flex mt-2 min-h-[2em]">
         {results[0] &&
-          results.map((v) => {
+          results.map((v,i) => {
             const goodStyle = "border rounded p-1 min-w-[1.5em] bg-green-600";
 
             const badStyle = "border rounded p-1 min-w-[1.5em] bg-red-600";
 
-            return <p className={v > bet ? goodStyle : badStyle}>${v}</p>;
+            return <p key={v+i} className={v > bet ? goodStyle : badStyle}>${v}</p>;
           })}
       </div>
       <Controls bet={bet} setBet={setBet} onDrop={handleDrop} />
