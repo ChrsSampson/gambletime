@@ -27,9 +27,11 @@ const symbols = ["🍒", "🍋", "🍊", "🍉", "🍇", "7️⃣", "🤑"];
 const SlotMachine: React.FC = ({
   balance,
   setBalance,
+  onRoundEnd
 }: {
   balance: number;
   setBalance: any;
+  onRoundEnd: () => void;
 }) => {
   // Slot state: each reel will have a symbol
   const [reels, setReels] = useState<string[]>(["🍒", "🍋", "🍊"]);
@@ -66,7 +68,7 @@ const SlotMachine: React.FC = ({
     setIsSpinning(true);
     setMessage("");
     setSpinCount((prev) => prev + 1);
-    setBalance(balance - bet);
+    setBalance(Number(bet) * -1); // Deduct the bet amount from balance
 
     // Simulate spinning by setting new random symbols after a short delay
     setTimeout(() => {
@@ -78,6 +80,7 @@ const SlotMachine: React.FC = ({
       setReels(newReels);
       checkForWin(newReels);
       setIsSpinning(false);
+       // check for bankruptcies or other side effects
     }, 1000); // 1 second delay for spinning effect
   };
 
@@ -87,6 +90,7 @@ const SlotMachine: React.FC = ({
       handleWin();
       setSpinCount(0);
     }
+    onRoundEnd(); // check for bankruptcies or other side effects
   };
 
   const updateBet = (v: any) => {
@@ -103,7 +107,7 @@ const SlotMachine: React.FC = ({
     console.log(Number(chance_table_1[icon].multiplier), Number(bet));
     console.log(win);
     setMessage("Congratulations! You win $" + win + "!");
-    setBalance(Number(balance) + Number(win));
+    setBalance(Number(win));
   };
 
   return (
@@ -126,7 +130,7 @@ const SlotMachine: React.FC = ({
       <div className="flex gap-2 justify-center place-items-center">
         <button
           onClick={spinReels}
-          disabled={isSpinning || bet <= 0}
+          disabled={isSpinning || bet <= 0 || bet > balance}
           className="w-[10em] py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300"
         >
           {isSpinning ? "Spinning..." : "Spin"}
@@ -144,7 +148,7 @@ const SlotMachine: React.FC = ({
           <input
             className="border rounded p-1 disabled:text-gray-400 disabled:bg-gray-500 disabled:cursor-not-allowed"
             placeholder="Bet"
-            disabled={isSpinning}
+            disabled={isSpinning || balance <= 0}
             max={500}
             value={bet}
             onChange={(e) => updateBet(e.target.value)}

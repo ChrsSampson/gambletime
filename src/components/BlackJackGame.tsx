@@ -49,8 +49,7 @@ const BlackjackGame = ({
     if (calculateScore(newHand) > 21) {
       setIsGameOver(true);
       setMessage("Bust! You lose.");
-      const l = Number(balance) - Number(bet);
-      setBalance(l); // Deduct bet if player loses
+      setBalance(Number(bet) * -1); // Deduct bet if player loses
     }
   };
 
@@ -70,19 +69,18 @@ const BlackjackGame = ({
     if (playerScore == 21) {
       result = "BlackJack!"
       const r = Number(bet) * (3/2)
-      setBalance(Number(balance) + Number(r))
+      setBalance(Number(r))
     }
     else if (dealerScore > 21 || playerScore > dealerScore) {
       result = "You win!";
-      const l = Number(balance) + Number(bet);
+      const l = Number(bet);
       setBalance(l); // Add bet if player wins
     }
     else if (dealerScore === playerScore) {
       result = "Push.";
     } else {
       result = "You lose.";
-      const l = Number(balance) - Number(bet);
-      setBalance(l); // Deduct bet if player loses
+      setBalance(Number(bet) * -1); // Deduct bet if player loses
     }
 
     setDealerHand(newDealerHand);

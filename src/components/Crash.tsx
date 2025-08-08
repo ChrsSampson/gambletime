@@ -9,9 +9,11 @@ const getRandomCrashPoint = () => {
 const Crash: React.FC = ({
   balance,
   setBalance,
+  onRoundEnd
 }: {
   balance: number;
   setBalance: any;
+  onRoundEnd: () => void;
 }) => {
   const [multiplier, setMultiplier] = useState(0.0);
   const [gameState, setGameState] = useState<"waiting" | "running" | "crashed">(
@@ -21,7 +23,7 @@ const Crash: React.FC = ({
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [cashOut, setCashOut] = useState<number | null>(null);
   const multiplierRef = useRef(0.0);
-  const [bet, setBet] = useState("");
+  const [bet, setBet] = useState(10);
   const [winAmount, setWinAmount] = useState(0);
 
   const animationRef = useRef<number | null>(null);
@@ -29,8 +31,7 @@ const Crash: React.FC = ({
   const lastValueRef = useRef<number>(0.0);
 
   const startGame = () => {
-    const newBalance = Number(balance) - Number(bet)
-    setBalance(newBalance) // take money at the start of the game
+    setBalance(Number(bet) * -1) // take money at the start of the game
 
     const point = getRandomCrashPoint();
     setCrashPoint(point);
@@ -55,7 +56,8 @@ const Crash: React.FC = ({
       setGameState("crashed");
       cancelAnimationFrame(animationRef.current!);
       //   player lose
-      setBalance(Number((balance -= Number(bet))));
+      setBalance(Number(bet) * -1);
+      onRoundEnd(); // check for bankruptcies or other side effects
       return;
     }
 
@@ -71,20 +73,18 @@ const Crash: React.FC = ({
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
 
       if(multiplier < 1.0){
-        // lose
-        // const p = 100 / Number(multiplier) 
+        // lose 
         const a = Number(multiplier) * Number(bet)
-        const b = Number(balance) + Number(a)
         setWinAmount(Number(a).toFixed(2)) // bullshit linting error
-        setBalance(b)
+        setBalance(a)
       } else {
         // payout
         const win = calculateWin();
-        const r = Number(balance) + Number(win);
         setWinAmount(win);
-        setBalance(r);
+        setBalance(Number(win));
       }
     }
+    onRoundEnd(); // check for bankruptcies or other side effects
   };
 
   function calculateWin() {
@@ -112,6 +112,7 @@ const Crash: React.FC = ({
         </div>
         {gameState === "waiting" && (
           <button
+            disabled={bet > balance || bet <= 0}
             onClick={startGame}
             className="px-6 py-2 bg-blue-500 hover:bg-blue-600 rounded"
           >
@@ -134,7 +135,7 @@ const Crash: React.FC = ({
                 : `💥 Crashed at ${multiplier.toFixed(2)}x`}
             </div>
             <button
-              disabled={Number(bet) <= 0}
+              disabled={Number(bet) <= 0 || Number(bet) > balance}
               onClick={startGame}
               className="px-6 py-2"
             >

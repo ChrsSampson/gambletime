@@ -137,7 +137,6 @@ const WheelOfFortune = forwardRef<WheelOfFortuneHandle>(({handleRestult, wipeRes
       setSpinning(true);
       setResult(null);
       Matter.Body.setAngularVelocity(wheelRef.current, Math.random() * 3 + 1);
-      console.log(Matter.Body.getAngularVelocity(wheelRef.current));
       const checkStop = setInterval(() => {
         const velocity = Math.abs(wheelRef.current!.angularVelocity);
 

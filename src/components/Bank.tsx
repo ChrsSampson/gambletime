@@ -10,10 +10,7 @@ export default function Bank({
   const [money, setMoney] = useLocalStorage("bankAccount", 2373.45);
 
   function applyBalance(v: number) {
-    const vv = Number(v);
-    const b = Number(v);
-
-    setBalance(vv + b);
+    setBalance(v);
   }
 
   function resetProgress() {

@@ -49,7 +49,7 @@ const PlinkoWorld: React.FC<{
 
     // Pegs
     for (let row = 0; row < cols; row++) {
-      for (let col = 0; col < cols; col++) {
+      for (let col = 0; col <= cols; col++) {
         const x = row % 2 === 0 ? col * spacing : col * spacing + spacing / 2;
         const y = row * spacing + 40;
         const peg = Matter.Bodies.circle(x, y, 5, {
@@ -145,22 +145,14 @@ const PlinkGame: React.FC<{
 
   const bucketScores = [20, 10, 2, 0.5, 0.2, 0.1, 0.1, 0.2, 0.5, 2, 10, 20];
   const width = 400;
-  const spacing = width / bucketScores.length;
+  const spacing = width / bucketScores.length + 2;
 
   function handlePayout(multiplier: number) {
-    let result = 0;
-    if (multiplier < 1) {
-      result = Number(bet) * Number(multiplier);
-    } else {
-      result = Number(bet) * Number(multiplier) + bet;
-    }
+    let result = Number(bet) * Number(multiplier);
     handleNewResult(result);
-    setBalance(prev => Number(prev) + Number(result)); // <-- Use functional update
+    setBalance(Number(result.toFixed(2))); // Pass the delta, not a function!
   }
 
-  function getBalance() {
-    return balance;
-  }
 
   function handleNewResult(v: Number) {
     const arr = [...results, v];
@@ -204,9 +196,7 @@ const PlinkGame: React.FC<{
   }, []);
 
   const handleDrop = () => {
-    // take money for the ball
-    const newBalance = Number(balance) - Number(bet);
-    setBalance(Number(newBalance));
+    setBalance(-Number(bet)); // Subtract the bet as a delta
 
     const engine = engineRef.current;
     const { Bodies, World } = Matter;
@@ -226,7 +216,7 @@ const PlinkGame: React.FC<{
     <div className="w-fit text-white border rounded p-4">
       <h1 className="text-center text-3xl font-bold pt-6">Plink World</h1>
       <div className="flex mt-2 min-h-[2em]">
-        {results[0] &&
+        {results.length > 0 &&
           results.map((v,i) => {
             const goodStyle = "border rounded p-1 min-w-[1.5em] bg-green-600";
 

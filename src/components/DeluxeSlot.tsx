@@ -14,8 +14,6 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
 
   function handleResult(index: number, value: any) {
 
-    console.log("Result:", value, Date.now());
-
     if(value.icon === null){
       wheelRefs[index].current?.spin();
     }
@@ -41,7 +39,7 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
       setFreeSpins(freeSpins - 1);
     } else {
       const betAmount = Number(bet);
-      setBalance(balance - betAmount);
+      setBalance(betAmount * -1);
     }
   }
 
@@ -65,25 +63,30 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
       return;
     }
 
-    // calculate non-bonus winnings
-    let multiplier = 0;
-    results.forEach((result) => {
-      multiplier += result.value || 0;
-    })
+      // calculate non-bonus winnings
+      let multiplier = 0;
+      results.forEach((result) => {
+        multiplier += result.value || 0;
+      })
 
-    total = Number(bet) * multiplier
+      total = Number(bet) * multiplier
 
-    // Jackpot: all three match and are not bonus
-    const isJackpot = uniqueValues.size === 1;
+      // Jackpot: all three match and are not bonus
+      const isJackpot = uniqueValues.size === 1;
 
-    if (isJackpot) {
-      total *= 10;
-      setMessage(`JACKPOT! You won ${total.toFixed(2)}!`);
-    } else {
-      setMessage(`You won ${total.toFixed(2)}!`);
-    }
+      if (isJackpot) {
+        total *= 10;
+        setMessage(`JACKPOT! You won ${total.toFixed(2)}!`);
+      } else {
+        setMessage(`You won ${total.toFixed(2)}!`);
+      }
 
-    setBalance(balance + total);
+      const r = total.toFixed(2);
+
+      console.log("Winnings: ", r);
+
+      setBalance(Number(r));
+      
   }
 
   useEffect(() => {
