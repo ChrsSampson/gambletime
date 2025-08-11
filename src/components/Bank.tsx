@@ -69,14 +69,17 @@ export default function Bank({
       <div className="border p-2 my-2 rounded">
         <h2>Accounts</h2>
         <h4>Account ending in ***223: {money.toFixed(2)}</h4>
-        <div>
+        <div className="flex justify-between gap-2">
           <input
+            className="w-full border rounded p-1"
             type="number"
             value={pendingAmount}
             onChange={(e) => setPendingAmount(Number(e.target.value))}
           />
-          <button className="" onClick={() => withdraw(pendingAmount)}>Withdraw</button>
-          <button className="" onClick={() => deposit(pendingAmount)}>Deposit</button>
+          <div className="flex gap-2">
+            <button className="" onClick={() => withdraw(pendingAmount)}>Withdraw</button>
+            <button className="" onClick={() => deposit(pendingAmount)}>Deposit</button>
+          </div>
         </div>
       </div>
       <div className="border p-2 my-2 rounded">

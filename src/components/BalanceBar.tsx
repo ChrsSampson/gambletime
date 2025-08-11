@@ -13,32 +13,50 @@ export default function BalanceBar({
         {balance > 0 && (
           <>
             <NavButton
-              text="Blackjack"
+              text="Blackjack ♠️"
               value="blackjack"
               currentPage={page}
               setPage={setPage}
             />
             <NavButton
-              text="Slots"
+              text="Video Poker 👑"
+              value="poker"
+              currentPage={page}
+              setPage={setPage}
+            />
+            <NavButton
+              text="Slots 🎰"
               value="slot"
               currentPage={page}
               setPage={setPage}
             />
             <NavButton
-              text="Stonks"
+              text="Stonks 📈"
               value="crash"
               currentPage={page}
               setPage={setPage}
             />
             <NavButton
-              text="PlinkWorld"
+              text="Plink World 🔴"
               value="plink"
               currentPage={page}
               setPage={setPage}
             />
             <NavButton
-              text="Fruit Spin"
+              text="Fruit Spin 🍒"
               value="spin"
+              currentPage={page}
+              setPage={setPage}
+            />
+            <NavButton
+              text="Mines 💣"
+              value="mines"
+              currentPage={page}
+              setPage={setPage}
+            />
+            <NavButton
+              text="Roulette 🟥"
+              value="roulette"
               currentPage={page}
               setPage={setPage}
             />

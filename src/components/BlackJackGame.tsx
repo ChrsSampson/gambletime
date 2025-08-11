@@ -105,7 +105,7 @@ const BlackjackGame = ({
               className="h-16 w-12 border text-black border-black rounded bg-white text-center text-xl flex flex-row items-center justify-center shadow"
             >
               {hideFirst && index === 0 && !isGameOver
-                ? "🂠"
+                ? "❓"
                 : `${card.rank}${card.suit}`}
             </div>
           ))}
@@ -118,8 +118,8 @@ const BlackjackGame = ({
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto text-center flex flex-col gap-5">
-      <div className="border rounded p-4">
+    <div className="p-8 max-w-md mx-auto text-center flex flex-col gap-5 border rounded">
+      <div className="p-4">
         <h1 className="text-3xl font-bold">Blackjack</h1>
         <h5 className="font-sm italic">Dealer Stands on 17</h5>
         <h5 className="font-sm italic">Blackjack pays out 3/2</h5>
