@@ -5,7 +5,7 @@ import AudioPlayer from "./ui/AudioPlayer";
 
 const placeholderIcon = { icon: '❓', value: null };
 
-export default function DeluxeSlot({balance, setBalance}: {balance: number, setBalance: (v:number) => void}) {
+export default function DeluxeSlot({balance, setBalance, onRoundEnd}: {balance: number, setBalance: (v:number) => void, onRoundEnd: () => void}) {
   const wheelRefs = [useRef(null), useRef(null), useRef(null),useRef(null)];
   const [results, setResult] = useState(Array(4).fill(placeholderIcon));
   const [bet,setBet] = useState(10);
@@ -86,7 +86,7 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
       console.log("Winnings: ", r);
 
       setBalance(Number(r));
-      
+      onRoundEnd()
   }
 
   useEffect(() => {
@@ -119,7 +119,7 @@ export default function DeluxeSlot({balance, setBalance}: {balance: number, setB
       </div>
       <div className="flex gap-2 justify-center place-items-center">
         <button onClick={handleSpin}>Spin</button>
-        <input disabled={freeSpins > 0} className="border rounded p-1 disabled:text-gray-300 disabled:border-gray-400 disabled:bg-gray-600" placeholder="Bet..." value={bet} onChange={(e) => setBet(e.target.value)} />
+        <input disabled={freeSpins > 0 || !message} className="border rounded p-1 disabled:text-gray-300 disabled:border-gray-400 disabled:bg-gray-600" placeholder="Bet..." value={bet} onChange={(e) => setBet(e.target.value)} />
         { freeSpins > 0 &&
           <span className="bold text-lg font-bold">Bonus Spins: {freeSpins}</span>
         }

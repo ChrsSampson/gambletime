@@ -13,7 +13,6 @@ import DeluxSlots from "./components/DeluxeSlot.tsx";
 function App() {
   const [page, setPage] = useState("spin");
   const [balance, setBalance] = useLocalStorage("balance", 1000);
-  const [inbank, setInBank] = useState(false);
   const [bankruptcies, setBankruptcies] = useLocalStorage("bankruptcies", 0);
 
   // Accept a delta (positive or negative)
