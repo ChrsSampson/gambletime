@@ -15,11 +15,10 @@ const lines = [
 export default function GameOver({
   counter,
   setPage,
-  setInBank,
 }: {
   counter: number;
   setPage: (v: string) => void;
-  setInBank: (b: boolean) => void;
+
 }) {
   const i = Math.floor(Math.random() * lines.length);
 
@@ -31,7 +30,6 @@ export default function GameOver({
       <p className="pb-2">{lines[i]}</p>
       <button
         onClick={() => {
-          setInBank(true);
           setPage("bank");
         }}
       >

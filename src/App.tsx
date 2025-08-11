@@ -69,7 +69,6 @@ function App() {
         return (
           <GameOver
             counter={bankruptcies}
-            setInBank={setInBank}
             setPage={setPage}
           />
         );
