@@ -11,6 +11,7 @@ import GameOver from "./components/GameOver.tsx";
 import DeluxSlots from "./components/DeluxeSlot.tsx";
 import MinesGame from "./components/mines.tsx";
 import VideoPoker from "./components/VideoPoker.tsx";
+import Ladder from "./components/Ladder.tsx";
 
 function App() {
   const [page, setPage] = useState("mines");
@@ -99,8 +100,8 @@ function App() {
             onRoundEnd={onRoundEnd}
           />
         );
-      case "snake":
-        return "";
+      case "ladder":
+        return <Ladder />;
       case "poker":
         return (
           <VideoPoker

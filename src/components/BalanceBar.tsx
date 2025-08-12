@@ -55,8 +55,8 @@ export default function BalanceBar({
               setPage={setPage}
             />
             <NavButton
-              text="Snake 🐍"
-              value="snake"
+              text="Ladder 🪜"
+              value="ladder"
               currentPage={page}
               setPage={setPage}
             />
