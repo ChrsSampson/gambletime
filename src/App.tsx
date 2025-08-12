@@ -10,7 +10,6 @@ import PlinkGame from "./components/Plinko.tsx";
 import GameOver from "./components/GameOver.tsx";
 import DeluxSlots from "./components/DeluxeSlot.tsx";
 import MinesGame from "./components/mines.tsx";
-import Roulette from "./components/roulette.tsx";
 import VideoPoker from "./components/VideoPoker.tsx";
 
 function App() {
@@ -61,8 +60,8 @@ function App() {
         return <DeluxSlots balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
       case "mines":
         return <MinesGame balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "roulette":
-        return <Roulette balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
+      case "snake":
+        return ""
       case "poker":
         return <VideoPoker balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
       case "gameover":

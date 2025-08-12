@@ -1,13 +1,30 @@
 {
   "name": "gambletime",
+  "main": "src/electron/main.cjs",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
-  "scripts": {
+  "type": "module",  "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "electron-dev": "wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+     "electron-build": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.yourname.gambletime",
+    "productName": "gambletime",
+    "directories": {
+      "buildResources": "assets",
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ],
+    "extraMetadata": {
+      "main": "electron/main.js"
+    }
   },
   "dependencies": {
     "@react-three/drei": "^10.6.1",
@@ -26,6 +43,10 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.0",
+    "cross-env": "^10.0.0",
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -34,6 +55,7 @@
     "tailwindcss": "^4.1.11",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "wait-on": "^8.0.4"
   }
 }

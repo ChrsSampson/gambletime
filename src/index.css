@@ -73,6 +73,28 @@ button:disabled{
 }
 
 
+/* Width of horizontal scrollbar */
+.scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+/* Track */
+.scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
 
 @keyframes spin {
   0% {
