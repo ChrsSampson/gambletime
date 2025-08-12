@@ -16,20 +16,23 @@ function App() {
   const [page, setPage] = useState("mines");
   const [balance, setBalance] = useLocalStorage("balance", 1000);
   const [bankruptcies, setBankruptcies] = useLocalStorage("bankruptcies", 0);
+  const [plays, setPlays] = useLocalStorage("plays", 0);
 
   // Accept a delta (positive or negative)
   const updateBalance = (delta: number) => {
     console.log("Updating balance:", delta);
     setBalance((prev: number) => {
-      return Number((Number(prev) + Number(delta)).toFixed(2)) // fix to 2 decimal places, fucking nonsense JS
+      return Number((Number(prev) + Number(delta)).toFixed(2)); // fix to 2 decimal places, fucking nonsense JS
     });
   };
 
   // check for bankruptcies and other side effects after each game concludes
   // this will stop bankruptcy from being triggered mid-game
   function onRoundEnd() {
-    const b = Number(localStorage.getItem("balance"))
-    if (b <= 0.00 || balance <= 0.00) {
+    setPlays(plays + 1);
+    const b = Number(localStorage.getItem("balance"));
+    console.log(b, balance, "checking");
+    if (b <= 0.0 || balance <= 0.0) {
       setBankruptcies(bankruptcies + 1);
       setPage("gameover");
     }
@@ -46,31 +49,68 @@ function App() {
   function getPage() {
     switch (page) {
       case "bank":
-        return <Bank balance={balance} setBalance={updateBalance}/>;
+        return <Bank balance={balance} setBalance={updateBalance} />;
       case "slot":
-        return <SlotMachine balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "blackjack":
-        return <BlackjackGame balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      
-      case "crash":
-        return <Crash balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "plink":
-        return <PlinkGame balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "spin":
-        return <DeluxSlots balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "mines":
-        return <MinesGame balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "snake":
-        return ""
-      case "poker":
-        return <VideoPoker balance={balance} setBalance={updateBalance} onRoundEnd={onRoundEnd}  />;
-      case "gameover":
         return (
-          <GameOver
-            counter={bankruptcies}
-            setPage={setPage}
+          <SlotMachine
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
           />
         );
+      case "blackjack":
+        return (
+          <BlackjackGame
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+
+      case "crash":
+        return (
+          <Crash
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+      case "plink":
+        return (
+          <PlinkGame
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+      case "spin":
+        return (
+          <DeluxSlots
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+      case "mines":
+        return (
+          <MinesGame
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+      case "snake":
+        return "";
+      case "poker":
+        return (
+          <VideoPoker
+            balance={balance}
+            setBalance={updateBalance}
+            onRoundEnd={onRoundEnd}
+          />
+        );
+      case "gameover":
+        return <GameOver counter={bankruptcies} setPage={setPage} />;
     }
   }
 

@@ -9,7 +9,7 @@ const getRandomCrashPoint = () => {
 const Crash: React.FC = ({
   balance,
   setBalance,
-  onRoundEnd
+  onRoundEnd,
 }: {
   balance: number;
   setBalance: any;
@@ -20,7 +20,7 @@ const Crash: React.FC = ({
     "waiting"
   );
   const [crashPoint, setCrashPoint] = useState(0);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
+  // const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   const [cashOut, setCashOut] = useState<number | null>(null);
   const multiplierRef = useRef(0.0);
   const [bet, setBet] = useState(10);
@@ -31,7 +31,7 @@ const Crash: React.FC = ({
   const lastValueRef = useRef<number>(0.0);
 
   const startGame = () => {
-    setBalance(Number(bet) * -1) // take money at the start of the game
+    setBalance(Number(bet) * -1); // take money at the start of the game
 
     const point = getRandomCrashPoint();
     setCrashPoint(point);
@@ -49,7 +49,7 @@ const Crash: React.FC = ({
     const elapsed = (timestamp - startTimeRef.current) / 1000; // in seconds
 
     // Curve: a fast-growing exponential curve
-    const newMultiplier = (1 + Math.pow(elapsed, 1.2) * 0.5) -1 ;
+    const newMultiplier = 1 + Math.pow(elapsed, 1.2) * 0.5 - 1;
 
     if (newMultiplier >= crashPoint) {
       setMultiplier(crashPoint);
@@ -72,11 +72,11 @@ const Crash: React.FC = ({
       setGameState("crashed");
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
 
-      if(multiplier < 1.0){
-        // lose 
-        const a = Number(multiplier) * Number(bet)
-        setWinAmount(Number(a).toFixed(2)) // bullshit linting error
-        setBalance(a)
+      if (multiplier < 1.0) {
+        // lose
+        const a = Number(multiplier) * Number(bet);
+        setWinAmount(Number(a).toFixed(2)); // bullshit linting error
+        setBalance(a);
       } else {
         // payout
         const win = calculateWin();

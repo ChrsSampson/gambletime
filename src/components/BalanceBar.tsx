@@ -8,8 +8,8 @@ export default function BalanceBar({
   page: string;
 }) {
   return (
-    <nav className="flex justify-between place-items-center w-1/2 pb-2">
-      <div className="flex justify-evenly gap-2 mx-4 max-w-2/3 overflow-scroll">
+    <nav className="flex justify-between place-items-center w-1/2 pb-4">
+      <div className="flex justify-evenly gap-2 mx-4  max-w-2/3 overflow-scroll">
         {balance > 0 && (
           <>
             <NavButton
@@ -82,7 +82,11 @@ function NavButton({
   setPage: (v: string) => void;
 }) {
   return (
-    <button disabled={currentPage == value} className="text-nowrap" onClick={() => setPage(value)}>
+    <button
+      disabled={currentPage == value}
+      className="text-nowrap"
+      onClick={() => setPage(value)}
+    >
       {text}
     </button>
   );
